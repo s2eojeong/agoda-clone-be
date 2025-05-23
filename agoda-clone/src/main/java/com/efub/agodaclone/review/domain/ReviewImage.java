@@ -1,10 +1,7 @@
 package com.efub.agodaclone.review.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity(name = "review_image")
 @Getter
@@ -19,6 +16,7 @@ public class ReviewImage {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name ="review_id", nullable = false)
+    @Setter(AccessLevel.PACKAGE)
     private Review review;
 
     @Builder

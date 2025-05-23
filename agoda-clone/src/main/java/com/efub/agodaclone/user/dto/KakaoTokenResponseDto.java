@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class KakaoTokenResponse {
+public class KakaoTokenResponseDto {
     @JsonProperty("access_token")
     private String accessToken;
     @JsonProperty("refresh_token")

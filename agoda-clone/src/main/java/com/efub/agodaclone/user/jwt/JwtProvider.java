@@ -1,5 +1,6 @@
 package com.efub.agodaclone.user.jwt;
 
+import com.efub.agodaclone.global.exception.ClientExceptionCode;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,16 +30,23 @@ public class JwtProvider {
                 .compact();
     }
 
+    //refresh token 발급용
+    public String generateRefreshToken(Long userId) {
+        long refreshExpirationMs = 1000L * 60 * 60 * 24 * 14; // 14일
+        return Jwts.builder()
+                .setSubject(String.valueOf(userId))
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + refreshExpirationMs))
+                .signWith(getKey(), SignatureAlgorithm.HS512)
+                .compact();
+    }
+
     public Long validateAndGetUserId(String token) {
-        try {
-            Claims claims = Jwts.parser()
-                    .setSigningKey(getKey()) // 고쳐야 하는 부분!
-                    .parseClaimsJws(token)
-                    .getBody();
-            return Long.valueOf(claims.getSubject());
-        } catch (JwtException | IllegalArgumentException e) {
-            throw new RuntimeException("유효하지 않은 토큰입니다.", e);
-        }
+        Claims claims = Jwts.parser()
+                .setSigningKey(getKey())
+                .parseClaimsJws(token)
+                .getBody();
+        return Long.valueOf(claims.getSubject());
     }
 
     private SecretKey getKey() {

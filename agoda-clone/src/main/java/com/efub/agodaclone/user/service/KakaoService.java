@@ -1,7 +1,7 @@
 package com.efub.agodaclone.user.service;
 
-import com.efub.agodaclone.user.dto.KakaoUserInfo;
-import com.efub.agodaclone.user.dto.KakaoTokenResponse;
+import com.efub.agodaclone.user.dto.KakaoUserResponseDto;
+import com.efub.agodaclone.user.dto.KakaoTokenResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -30,7 +30,6 @@ public class KakaoService {
         params.add("client_id", clientId);
         params.add("redirect_uri", redirectUri);
         params.add("code", code);
-        //params.add("client_secret", "{CLIENT_SECRET}"); // 선택 사항
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -38,12 +37,13 @@ public class KakaoService {
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<KakaoTokenResponse> response = restTemplate.postForEntity(tokenUrl, request, KakaoTokenResponse.class);
+        ResponseEntity<KakaoTokenResponseDto> response = restTemplate.postForEntity(tokenUrl, request, KakaoTokenResponseDto.class);
 
         return response.getBody().getAccessToken();
     }
 
-    public KakaoUserInfo getUserInfo(String accessToken) {
+    //카카오에서 user 정보 받아옴
+    public KakaoUserResponseDto getUserInfo(String accessToken) {
         String userInfoUrl = "https://kapi.kakao.com/v2/user/me";
 
         HttpHeaders headers = new HttpHeaders();
@@ -52,7 +52,7 @@ public class KakaoService {
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<KakaoUserInfo> response = restTemplate.exchange(userInfoUrl, HttpMethod.GET, request, KakaoUserInfo.class);
+        ResponseEntity<KakaoUserResponseDto> response = restTemplate.exchange(userInfoUrl, HttpMethod.GET, request, KakaoUserResponseDto.class);
 
         return response.getBody();
     }

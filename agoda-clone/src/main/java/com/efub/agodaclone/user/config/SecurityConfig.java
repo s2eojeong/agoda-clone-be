@@ -24,7 +24,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/kakao-login.html",
-                                "/kakao/callback",
+                                "/oauth/reissue",
+                                "/oauth/login",
                                 "/css/**", "/js/**", "/images/**"
                         ).permitAll()
                         .requestMatchers("/oauth/logout").authenticated()

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class KakaoUserInfo {
+public class KakaoUserResponseDto {
     private Long id;
 
     @JsonProperty("kakao_account")
@@ -18,7 +18,6 @@ public class KakaoUserInfo {
         @Data
         public static class Profile {
             private String nickname;
-//            private String profileImageUrl;
         }
     }
 }

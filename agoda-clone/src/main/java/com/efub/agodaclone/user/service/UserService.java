@@ -1,7 +1,7 @@
 package com.efub.agodaclone.user.service;
 
 import com.efub.agodaclone.user.domain.CustomUserDetails;
-import com.efub.agodaclone.user.dto.KakaoUserInfo;
+import com.efub.agodaclone.user.dto.KakaoUserResponseDto;
 import com.efub.agodaclone.user.domain.User;
 import com.efub.agodaclone.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,30 +20,8 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
 
-//    @Transactional(readOnly = true)
-//    public Optional<User> findByKakaoId(String kakaoId) {
-//        return userRepository.findByKakaoId(kakaoId);
-//    }
-//
-//    @Transactional
-//    public User registerKakaoUser(String kakaoId, String email, String name) {
-//        User user = User.builder()
-//                .kakaoId(kakaoId)
-//                .email(email)
-//                .name(name)
-//                .createdAt(LocalDateTime.now())
-//                .build();
-//        return userRepository.save(user);
-//    }
-
-//    @Transactional
-//    public User loginOrRegister(String kakaoId, String email, String name) {
-//        return userRepository.findByKakaoId(kakaoId)
-//                .orElseGet(() -> registerKakaoUser(kakaoId, email, name));
-//    }
-
-    public User registerOrLogin(KakaoUserInfo kakaoUserInfo) {
-        String kakaoId = String.valueOf(kakaoUserInfo.getId());
+    public User registerOrLogin(KakaoUserResponseDto kakaoUserResponseDto) {
+        String kakaoId = String.valueOf(kakaoUserResponseDto.getId());
         Optional<User> userOptional = userRepository.findByKakaoId(kakaoId);
 
         if (userOptional.isPresent()) {
@@ -51,8 +29,8 @@ public class UserService {
         } else {
             User newUser = User.builder()
                     .kakaoId(kakaoId)
-                    .email(kakaoUserInfo.getKakaoAccount().getEmail())
-                    .name(kakaoUserInfo.getKakaoAccount().getProfile().getNickname())
+                    .email(kakaoUserResponseDto.getKakaoAccount().getEmail())
+                    .name(kakaoUserResponseDto.getKakaoAccount().getProfile().getNickname())
                     .createdAt(LocalDateTime.now())
                     .build();
             return userRepository.save(newUser);

@@ -72,4 +72,9 @@ public class ReservationService {
             return "체크아웃 완료";
         } else return "체크인 완료";
     }
+
+    public Reservation findReservationById(Long id) {
+        return reservationRepository.findById(id)
+                .orElseThrow(()->new AgodaException(ExceptionCode.RESOURCE_NOT_FOUND));
+    }
 }

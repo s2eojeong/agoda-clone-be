@@ -15,7 +15,7 @@
 
     document.getElementById('kakao-login-btn').addEventListener('click', function () {
         Kakao.Auth.authorize({
-            redirectUri: 'http://localhost:8080/kakao/callback'
+            redirectUri: 'http://localhost:8080/oauth/login'
         });
     });
 </script>

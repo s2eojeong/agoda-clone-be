@@ -1,7 +1,13 @@
 package com.efub.agodaclone.user.jwt;
 
+import com.efub.agodaclone.global.exception.AgodaException;
+import com.efub.agodaclone.global.exception.ExceptionCode;
+import com.efub.agodaclone.user.domain.CustomUserDetails;
+import com.efub.agodaclone.user.domain.User;
+import com.efub.agodaclone.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,36 +25,46 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String header = request.getHeader("Authorization");
+        String token = extractTokenFromHeaderOrCookie(request);
 
-        if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
-            try {
-                Long userId = jwtProvider.validateAndGetUserId(token);
+        if (token != null) {
+            Long userId = jwtProvider.validateAndGetUserId(token);
 
-                // Spring Security가 인식할 수 있게 인증 객체 등록
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userId, null,
-                                List.of(new SimpleGrantedAuthority("ROLE_USER")));
+            User user = userRepository.findById(userId).orElseThrow(()-> new AgodaException(ExceptionCode.RESOURCE_NOT_FOUND));
+            CustomUserDetails userDetails = new CustomUserDetails(user.getUserId(), user.getEmail(), user.getName());
 
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(userDetails, null,
+                            List.of(new SimpleGrantedAuthority("ROLE_USER")));
 
-                // userId 저장
-                request.setAttribute("userId", userId); // 간단하게 저장하는 예시
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-
-
-            } catch (RuntimeException e) {
-                System.out.println("JWT 검증 실패: " + e.getMessage());
-            }
+            request.setAttribute("userId", userId);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private String extractTokenFromHeaderOrCookie(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("access_token")) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
+        return null;
     }
 }

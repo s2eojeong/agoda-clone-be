@@ -2,6 +2,7 @@ package com.efub.agodaclone.review.domain;
 
 import com.efub.agodaclone.global.entity.BaseEntity;
 import com.efub.agodaclone.reservation.domain.Reservation;
+import com.efub.agodaclone.review.dto.request.ReviewCreateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -45,11 +46,30 @@ public class Review extends BaseEntity {
         this.serviceScore = serviceScore;
         this.locationScore = locationScore;
         this.reservation = reservation;
+        this.reviewImages = reviewImages;
+    }
+
+    public static Review create(Reservation reservation, ReviewCreateRequest request){
+        Review review = Review.builder()
+                .reservation(reservation)
+                .locationScore(request.getLocationScore())
+                .serviceScore(request.getServiceScore())
+                .cleanlinessScore(request.getCleanScore())
+                .content(request.getReviewText())
+                .build();
+        request.getReviewImages().forEach(url ->{
+            ReviewImage img = ReviewImage.builder()
+                    .reviewImage(url)
+                    .build();
+            review.addReviewImage(img);
+        });
+        return review;
     }
 
     // 리뷰 이미지 추가
     public void addReviewImage(ReviewImage reviewImage) {
         this.reviewImages.add(reviewImage);
+        reviewImage.setReview(this);
     }
 
     // 리뷰 이미지 삭제

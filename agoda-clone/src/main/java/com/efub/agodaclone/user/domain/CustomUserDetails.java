@@ -11,10 +11,12 @@ import java.util.Collections;
 public class CustomUserDetails implements UserDetails {
     private final Long id;
     private final String email;
+    private final String name;
 
-    public CustomUserDetails(Long id, String email) {
+    public CustomUserDetails(Long id, String email, String name) {
         this.id = id;
         this.email = email;
+        this.name = name;
     }
 
     @Override

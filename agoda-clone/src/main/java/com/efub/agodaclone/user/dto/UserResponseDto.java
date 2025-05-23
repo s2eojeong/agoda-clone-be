@@ -8,13 +8,13 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserResponse {
+public class UserResponseDto {
     private Long id;
     private String email;
     private String name;
 
-    public static UserResponse from(User user) {
-        return UserResponse.builder()
+    public static UserResponseDto from(User user) {
+        return UserResponseDto.builder()
                 .id(user.getUserId())
                 .email(user.getEmail())
                 .name(user.getName())
